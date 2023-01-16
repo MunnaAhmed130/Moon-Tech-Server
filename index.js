@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 // mongodb
 const { MongoClient, ServerApiVersion } = require("mongodb");
+const ObjectId = require("mongodb").ObjectId;
 // cors
 const cors = require("cors");
 // middleware
@@ -28,10 +29,26 @@ async function run() {
         const pcCollection = database.collection("Gaming_PC");
 
         // find all products
-        app.get("/all", async (req, res) => {
+        app.get("/product", async (req, res) => {
             const cursor = pcCollection.find({}).limit(0);
             const products = await cursor.toArray();
             res.json(products);
+        });
+
+        // post a product
+        app.post("/product", async (req, res) => {
+            const product = req.body;
+            const result = await pcCollection.insertOne(product);
+            res.json(result);
+        });
+
+        // delete a product
+        app.delete("/product/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await pcCollection.deleteOne(query);
+            console.log(result);
+            res.json(result);
         });
     } finally {
         // await client.close();
