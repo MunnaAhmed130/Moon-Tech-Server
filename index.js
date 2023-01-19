@@ -30,9 +30,45 @@ async function run() {
 
         // find all products
         app.get("/product", async (req, res) => {
-            const cursor = pcCollection.find({}).limit(0);
+            const cursor = pcCollection.find({});
             const products = await cursor.toArray();
             res.json(products);
+        });
+
+        // find product by id
+        app.get("/product/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const cursor = await pcCollection.findOne(query);
+            // const products = await cursor.toArray();
+            // console.log(req);
+            res.json(cursor);
+        });
+
+        // update product info by id
+        app.put("/product/:id", async (req, res) => {
+            const body = req.body;
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const updateDoc = {
+                $set: {
+                    model: body.model,
+                    image: body.image,
+                    brand: body.brand,
+                    status: body.status,
+                    price: body.price,
+                    keyFeature: [
+                        body.keyFeature[0],
+                        body.keyFeature[1],
+                        body.keyFeature[2],
+                        body.keyFeature[3],
+                    ],
+                },
+            };
+            const result = await pcCollection.updateOne(query, updateDoc);
+
+            console.log(id, body._id);
+            res.json(result);
         });
 
         // post a product
@@ -49,6 +85,8 @@ async function run() {
             const result = await pcCollection.deleteOne(query);
             console.log(result);
             res.json(result);
+
+            // update a product
         });
     } finally {
         // await client.close();
