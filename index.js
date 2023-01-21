@@ -33,6 +33,7 @@ async function run() {
             const cursor = pcCollection.find({});
             const products = await cursor.toArray();
             res.json(products);
+            // res.send({ status: true, data: products });
         });
 
         // find product by id
